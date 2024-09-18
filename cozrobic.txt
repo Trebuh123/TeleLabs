@@ -1,9 +1,0 @@
-1. zrobic strone "O nas"
-2. zrobic strone "Kontakt"
-2.1 jezeli to mozliwe zrobienie mozliwosci wyslania na emaila wiadomosci przez strone
-3. zrobic strone "Twoje konto"
-3.1 dodac mozliwosc zalogowania sie, sprwadzenie produktow uzupelnienia danych oraz zakupow
-4. zrobic strone "Strona główna"
-5. wypisanie wszystkich produktow opisow itp odpowiednio do kategorii
-6. dokończeniówka
-7.znalezc domene dla tej strony
