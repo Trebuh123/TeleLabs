@@ -8,15 +8,15 @@
         /* (stylizacja pozostała bez zmian) */
         body {
             background: linear-gradient(rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.5)), 
-                url('fame.jpg'); /* Podmień na swój obraz */
+                url('tlo.png');
             background-size: cover;
             background-repeat: no-repeat;
             background-attachment: fixed;
             background-position: center;
-            transition: background-position 0.1s ease-out,;
+            transition: background-position 0.1s ease-out;
             font-size: 1em;
             margin: 0;
-                overflow-x: hidden; /* Ukryj przewijanie poziome */
+            overflow-x: hidden;
         }
         h1 {
             position: absolute;
@@ -34,7 +34,7 @@
             padding: 1rem;
             text-align: center;
             position: relative;
-            border-radius: 0 0 15px 15px; /* Zaokrąglone boki - dolne rogi */
+            border-radius: 0 0 15px 15px;
             flex-direction: column;
         }
         nav {
@@ -112,34 +112,6 @@
             transition: transform 0.3s, color 0.3s;
             animation: priceChange 1s infinite;
         }
-        .input-group {
-            margin-bottom: 1rem;
-        }
-        .input-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-size: 1.1rem;
-            color: #555;
-        }
-        .input-group input,
-        .input-group select {
-            padding: 0.7rem;
-            width: 100%;
-            font-size: 1.1rem;
-            border: 2px solid #ddd;
-            border-radius: 4px;
-            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
-            transition: border-color 0.3s, box-shadow 0.3s;
-        }
-        .input-group input:focus,
-        .input-group select:focus {
-            border-color: #28a745;
-            box-shadow: 0 0 8px rgba(40, 167, 69, 0.3);
-            outline: none;
-        }
-        .input-group input:invalid {
-            border-color: #e60000;
-        }
         .product-details button {
             background-color: #28a745;
             color: #fff;
@@ -207,7 +179,7 @@
 
         /* Styles for the modal */
         .modal {
-            display: none; /* Hidden by default */
+            display: none;
             position: fixed;
             z-index: 1;
             left: 0;
@@ -294,149 +266,121 @@
     </style>
     <script>
         document.addEventListener('mousemove', function(e) {
-            // Oblicz procentowe przesunięcie w poziomie i pionie na podstawie pozycji kursora
             const x = (e.clientX / window.innerWidth) * 30;
             const y = (e.clientY / window.innerHeight) * 30;
-        
-            // Ustaw nową pozycję tła
             document.body.style.backgroundPosition = `${x}% ${y}%`;
         });
-        </script>
-        
- <script>
-    // Stałe ceny i mnożniki
-    let basePrice = 6200; // Cena bazowa w PLN za 1 m²
-    const outdoorMultiplier = 1.15; // Wzrost ceny o 15% dla zewnętrznego użycia
+    </script>
 
-    // Function to update price
-    function updatePrice() {
-        const width = parseFloat(document.getElementById('width').value);
-        const height = parseFloat(document.getElementById('height').value);
-        const location = document.getElementById('use-location').value;
+    <script>
+        // Stała cena produktu
+        const productPrice = 4500;
 
-        if (isNaN(width) || isNaN(height) || width <= 0 || height <= 0) {
-            document.getElementById('price').textContent = "Cena: Proszę wprowadzić prawidłowe wymiary.";
-            return;
-        }
+// Funkcja dodająca produkt do koszyka
+function addToCart() {
+    const product = {
+        id: Math.random().toString(36).substr(2, 9), // losowy unikalny identyfikator produktu
+        name: "Telebim Model Z",
+        price: productPrice,
+        quantity: 1
+    };
 
-        let area = width * height;
-        let price = basePrice * area;
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
-        if (location === 'outdoor') {
-            price *= outdoorMultiplier;
-        }
+    // Sprawdź, czy produkt o tym samym ID już jest w koszyku
+    const existingProductIndex = cart.findIndex(item => item.id === product.id);
 
-        document.getElementById('price').textContent = `Cena: ${price.toFixed(2)} PLN`;
+    if (existingProductIndex !== -1) {
+        // Jeśli produkt jest już w koszyku, zwiększ ilość
+        cart[existingProductIndex].quantity += 1;
+    } else {
+        // Jeśli nie ma produktu w koszyku, dodaj go
+        cart.push(product);
     }
 
-    // Function to add item to cart
-    function addToCart() {
-        const width = parseFloat(document.getElementById('width').value);
-        const height = parseFloat(document.getElementById('height').value);
-        const location = document.getElementById('use-location').value;
-        const price = document.getElementById('price').textContent.split(' ')[1]; // Pobierz cenę z DOM
-        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+    localStorage.setItem('cart', JSON.stringify(cart));
 
-        if (isNaN(width) || isNaN(height) || width <= 0 || height <= 0) {
-            alert("Proszę wprowadzić prawidłowe wymiary.");
-            return;
-        }
+    alert("Dodano do koszyka!");
+    updateCart();
+}
 
-        const product = {
-            width: width,
-            height: height,
-            location: location,
-            price: price,
-            quantity: 1 // Zakładamy ilość 1
-        };
+// Funkcja aktualizująca widok koszyka
+function updateCart() {
+    const cartModal = document.getElementById('cart-modal');
+    const cartItems = JSON.parse(localStorage.getItem('cart')) || [];
+    const cartContainer = document.getElementById('cart-items');
 
-        cart.push(product); // Dodaj produkt do koszyka
-        localStorage.setItem('cart', JSON.stringify(cart)); // Zapisz koszyk do localStorage
+    cartContainer.innerHTML = '';
 
-        alert("Dodano do koszyka!");
-        updateCart();
+    if (cartItems.length === 0) {
+        cartContainer.innerHTML = '<p>Twój koszyk jest pusty.</p>';
+        return;
     }
 
-    // Function to update cart modal (display items in cart)
-    function updateCart() {
-        const cartModal = document.getElementById('cart-modal');
-        const cartItems = JSON.parse(localStorage.getItem('cart')) || [];
-        const cartContainer = document.getElementById('cart-items');
-
-        cartContainer.innerHTML = ''; // Wyczyszczenie istniejących elementów
-
-        if (cartItems.length === 0) {
-            cartContainer.innerHTML = '<p>Twój koszyk jest pusty.</p>';
-            return;
-        }
-
-        // Wyświetlenie produktów w koszyku
-        cartItems.forEach((item, index) => {
-            const cartItem = document.createElement('div');
-            cartItem.classList.add('cart-item');
-            cartItem.innerHTML = `
-                <span>${item.width}x${item.height}m - ${item.location} - ${item.price} PLN</span>
-                <button class="remove-btn" data-index="${index}">X</button>
-            `;
-            cartContainer.appendChild(cartItem);
-        });
-
-        // Dodaj nasłuchiwacze na przyciski usuwania
-        document.querySelectorAll('.remove-btn').forEach(button => {
-            button.addEventListener('click', removeFromCart);
-        });
-
-        cartModal.classList.add('show');
-    }
-
-    // Function to remove item from cart
-    function removeFromCart(event) {
-        const index = event.target.getAttribute('data-index');
-        let cartItems = JSON.parse(localStorage.getItem('cart')) || [];
-
-        cartItems.splice(index, 1); // Usuń produkt z koszyka
-        localStorage.setItem('cart', JSON.stringify(cartItems)); // Zaktualizuj koszyk
-
-        updateCart(); // Odśwież widok koszyka po usunięciu
-    }
-
-    // Function to show cart modal
-    function showCart() {
-        updateCart();
-    }
-
-    // Function to close cart modal
-    function closeCart() {
-        document.getElementById('cart-modal').classList.remove('show');
-    }
-
-    // Function to close modal (background effect)
-    function closeModal() {
-        document.getElementById('modal').classList.remove('show');
-    }
-
-    // Function to show modal (background effect)
-    function showModal() {
-        document.getElementById('modal').classList.add('show');
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-        document.querySelector('.cart-icon img').addEventListener('click', showCart); // Ikona koszyka
-        document.querySelector('#cart-modal button').addEventListener('click', closeCart); // Zamknięcie koszyka
-        document.getElementById('modal').addEventListener('click', closeModal); // Zamknięcie modala
+    cartItems.forEach((item, index) => {
+        const cartItem = document.createElement('div');
+        cartItem.classList.add('cart-item');
+        cartItem.innerHTML = `
+            <span>${item.name} - ${item.price} PLN x ${item.quantity}</span>
+            <button class="remove-btn" data-index="${index}">X</button>
+        `;
+        cartContainer.appendChild(cartItem);
     });
-</script>
+
+    // Dodaj nasłuchiwacze na przyciski usuwania
+    document.querySelectorAll('.remove-btn').forEach(button => {
+        button.addEventListener('click', removeFromCart);
+    });
+}
+
+
+        // Funkcja usuwająca produkt z koszyka
+        function removeFromCart(event) {
+            const index = event.target.getAttribute('data-index');
+            let cartItems = JSON.parse(localStorage.getItem('cart')) || [];
+
+            cartItems.splice(index, 1);
+            localStorage.setItem('cart', JSON.stringify(cartItems));
+
+            updateCart();
+        }
+
+        // Funkcja pokazująca koszyk
+        function showCart() {
+            updateCart();
+            document.getElementById('cart-modal').classList.add('show');
+        }
+
+        // Funkcja zamykająca koszyk
+        function closeCart() {
+            document.getElementById('cart-modal').classList.remove('show');
+        }
+
+        // Funkcje do obsługi modala ze zdjęciem
+        function closeModal() {
+            document.getElementById('modal').classList.remove('show');
+        }
+
+        function showModal() {
+            document.getElementById('modal').classList.add('show');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelector('.cart-icon img').addEventListener('click', showCart);
+            document.querySelector('#cart-modal button').addEventListener('click', closeCart);
+            document.getElementById('modal').addEventListener('click', closeModal);
+
+            // Załaduj koszyk przy starcie
+            updateCart();
+        });
+    </script>
 
 </head>
 <body>
     <header>
         <h1>TeleLab Sklep</h1>
         <nav>
-            <a href="O_nas.html" class="button-link">O nas</a>
-            <a href="sklep.html" class="button-link">Sklep</a>
-            <a href="index.html" class="button-link">Strona główna</a>
-            <a href="twoje_konto.html" class="button-link">Twoje Konto</a>
-            <a href="kontakt.html" class="button-link">Kontakt</a>
+            <a href="index.html" class="button-link">Sklep</a>
         </nav>
         <a href="#koszyk" class="cart-icon">
             <img src="cart.png" alt="Koszyk">
@@ -448,22 +392,7 @@
                 <h2>Telebim Model Z</h2>
                 <p><strong>Telebim Model Z</strong><p>Wysokiej jakości telebim zaprojektowany z myślą o wszechstronnych zastosowaniach, zarówno w zamkniętych pomieszczeniach, jak i na zewnątrz. Dzięki nowoczesnej technologii LED, oferuje jasny i wyraźny obraz, który doskonale sprawdza się podczas niestandardowych wydarzeń i prezentacji. Jego solidna konstrukcja i łatwa obsługa zapewniają niezawodność i elastyczność w każdej lokalizacji.</p>
             </p>
-                <div id="price" class="price">6200 PLN</div>
-                <div class="input-group">
-                    <label for="width">Szerokość (w metrach):</label>
-                    <input type="number" id="width" min="0" step="0.01" oninput="updatePrice()" placeholder="Wpisz szerokość">
-                </div>
-                <div class="input-group">
-                    <label for="height">Wysokość (w metrach):</label>
-                    <input type="number" id="height" min="0" step="0.01" oninput="updatePrice()" placeholder="Wpisz wysokość">
-                </div>
-                <div class="input-group">
-                    <label for="use-location">Typ użycia:</label>
-                    <select id="use-location" onchange="updatePrice()">
-                        <option value="indoor">Wewnątrz</option>
-                        <option value="outdoor">Na zewnątrz</option>
-                    </select>
-                </div>
+                <div id="price" class="price">6200 PLN</div> 
                 <button onclick="addToCart()">Dodaj do koszyka</button>
             </div>
             <div class="product-image">
